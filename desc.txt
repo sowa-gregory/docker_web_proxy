@@ -3,9 +3,11 @@ Simple dns server for docker services
 - reconfigure router dns:
 
 In file /etc/dnsmasq.conf
-Add entry:
+Add entry to redirect all resolv requests for domain eniac
 server=/eniac/1.1.1.1
 
+Add entry to allow answers from upstream dns server which are in private range
+rebind-domain-ok=/eniac/
 
 
 Test

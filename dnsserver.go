@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"strconv"
@@ -26,13 +25,16 @@ func getOutboundIP() string {
 
 func parseQuery(m *dns.Msg) {
 	for _, q := range m.Question {
+		m.Authoritative = true
 		switch q.Qtype {
 		case dns.TypeA:
 			log.Printf("Query for %s, response:%s\n", q.Name, ip)
-			rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
-			if err == nil {
-				m.Answer = append(m.Answer, rr)
-			}
+
+				m.Answer = append(m.Answer, &dns.A{
+				Hdr: dns.RR_Header{ Name: q.Name, Rrtype: dns.TypeA, Class: dns.ClassINET, Ttl: 60 },
+				A: net.ParseIP(ip),
+			})
+
 		}
 	}
 }
