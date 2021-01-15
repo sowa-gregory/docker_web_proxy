@@ -2,8 +2,8 @@ Simple dns server for docker services
 
 - reconfigure router dns:
 
-/etc/dnsmasq.conf
-
+In file /etc/dnsmasq.conf
+Add entry:
 server=/eniac/1.1.1.1
 
 
