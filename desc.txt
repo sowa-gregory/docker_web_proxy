@@ -1,0 +1,13 @@
+Simple dns server for docker services
+
+- reconfigure router dns:
+
+/etc/dnsmasq.conf
+
+server=/eniac/1.1.1.1
+
+
+
+Test
+dig @127.0.0.1 -p 53 test.eniac
+
