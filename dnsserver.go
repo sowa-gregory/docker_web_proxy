@@ -12,10 +12,10 @@ import (
 var ip string
 const domain = "home." // domain name to response for
 const port = 53
-const docker_host_dns = "pc-server"
+const version = "HomeDNSServer 0.9"
 
-func getDockerHostIP() string {
-	ips, err := net.LookupIP(docker_host_dns)
+func getDockerHostIP(dns string) string {
+	ips, err := net.LookupIP(dns)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Could not get IPs: %v\n", err)
 		os.Exit(1)
@@ -51,7 +51,14 @@ func handleDNSRequest(w dns.ResponseWriter, r *dns.Msg) {
 }
 
 func main() {
-	ip = getDockerHostIP()
+	log.Printf(version+"\n")
+	proxy_host_dns := os.Getenv("PROXY_HOST")
+	if (proxy_host_dns == "" ) {
+		log.Printf("PROXY_HOST env not set\n")
+		os.Exit(1)
+}
+	log.Printf("Proxy DNS:%s\n", proxy_host_dns)
+	ip = getDockerHostIP(proxy_host_dns)
 	log.Printf("DNS host ip: %s\n", ip)
 	// attach request handler func
 	dns.HandleFunc(domain, handleDNSRequest)
