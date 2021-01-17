@@ -4,23 +4,23 @@ import (
 	"log"
 	"net"
 	"strconv"
-
+	"fmt"
+	"os"
 	"github.com/miekg/dns"
 )
 
 var ip string
-
-const domain = "eniac." // domain name to response for
+const domain = "home." // domain name to response for
 const port = 53
+const docker_host_dns = "pc-server"
 
-func getOutboundIP() string {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
+func getDockerHostIP() string {
+	ips, err := net.LookupIP(docker_host_dns)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "Could not get IPs: %v\n", err)
+		os.Exit(1)
 	}
-	defer conn.Close()
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	return localAddr.IP.String()
+	return ips[0].String()
 }
 
 func parseQuery(m *dns.Msg) {
@@ -51,14 +51,14 @@ func handleDNSRequest(w dns.ResponseWriter, r *dns.Msg) {
 }
 
 func main() {
-	ip = getOutboundIP()
-	log.Printf("Local ip: %s\n", ip)
+	ip = getDockerHostIP()
+	log.Printf("DNS host ip: %s\n", ip)
 	// attach request handler func
 	dns.HandleFunc(domain, handleDNSRequest)
 
 	// start server
 	server := &dns.Server{Addr: ":" + strconv.Itoa(port), Net: "udp"}
-	log.Printf("Starting at port:%d\n", port)
+	log.Printf("Starting at UDP port:%d\n", port)
 	log.Printf("Resolves DNS for domain:%s\n", domain)
 	err := server.ListenAndServe()
 	defer server.Shutdown()
