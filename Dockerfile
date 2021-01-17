@@ -12,6 +12,6 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 COPY --from=build /app/dnsserver .
 ENV PROXY_HOST host
-ENTRYPOINT dnsserver
+ENTRYPOINT ["dnsserver"]
 EXPOSE 53/udp
 
